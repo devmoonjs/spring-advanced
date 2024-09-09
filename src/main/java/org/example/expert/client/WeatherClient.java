@@ -41,11 +41,13 @@ public class WeatherClient {
     }
 
     private static void validWeatherData(WeatherDto[] weatherArray, ResponseEntity<WeatherDto[]> responseEntity) {
-        if (weatherArray == null || weatherArray.length == 0)
-            throw new ServerException("날씨 데이터가 없습니다.");
 
         if (!HttpStatus.OK.equals(responseEntity.getStatusCode()))
             throw new ServerException("데이터를 가져오는데 실패했습니다. 상태 코드 : " + responseEntity.getStatusCode());
+
+        if (weatherArray == null || weatherArray.length == 0) {
+            throw new ServerException("날씨 데이터가 없습니다.");
+        }
     }
 
     private URI buildWeatherApiUri() {
