@@ -17,6 +17,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private static final Integer PASSWORD_MIN_LENGTH = 8;
 
     public UserResponse getUser(long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new InvalidRequestException("User not found"));
@@ -25,11 +26,8 @@ public class UserService {
 
     @Transactional
     public void changePassword(long userId, UserChangePasswordRequest userChangePasswordRequest) {
-        if (userChangePasswordRequest.getNewPassword().length() < 8 ||
-                !userChangePasswordRequest.getNewPassword().matches(".*\\d.*") ||
-                !userChangePasswordRequest.getNewPassword().matches(".*[A-Z].*")) {
-            throw new InvalidRequestException("새 비밀번호는 8자 이상이어야 하고, 숫자와 대문자를 포함해야 합니다.");
-        }
+
+        validPassword(userChangePasswordRequest);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new InvalidRequestException("User not found"));
@@ -43,5 +41,25 @@ public class UserService {
         }
 
         user.changePassword(passwordEncoder.encode(userChangePasswordRequest.getNewPassword()));
+    }
+
+    private static void validPassword(UserChangePasswordRequest userChangePasswordRequest) {
+        if (validPasswordLength(userChangePasswordRequest) ||
+                !containsNumber(userChangePasswordRequest) ||
+                !containsUpperCase(userChangePasswordRequest)) {
+            throw new InvalidRequestException("새 비밀번호" + PASSWORD_MIN_LENGTH + " 자 이상이어야 하고, 숫자와 대문자를 포함해야 합니다.");
+        }
+    }
+
+    private static boolean validPasswordLength(UserChangePasswordRequest userChangePasswordRequest) {
+        return userChangePasswordRequest.getNewPassword().length() < PASSWORD_MIN_LENGTH;
+    }
+
+    private static boolean containsUpperCase(UserChangePasswordRequest userChangePasswordRequest) {
+        return userChangePasswordRequest.getNewPassword().matches(".*[A-Z].*");
+    }
+
+    private static boolean containsNumber(UserChangePasswordRequest userChangePasswordRequest) {
+        return userChangePasswordRequest.getNewPassword().matches(".*\\d.*");
     }
 }
