@@ -43,7 +43,7 @@ public class UserService {
         user.changePassword(passwordEncoder.encode(userChangePasswordRequest.getNewPassword()));
     }
 
-    private static void validPassword(UserChangePasswordRequest userChangePasswordRequest) {
+    private void validPassword(UserChangePasswordRequest userChangePasswordRequest) {
         if (validPasswordLength(userChangePasswordRequest) ||
                 !containsNumber(userChangePasswordRequest) ||
                 !containsUpperCase(userChangePasswordRequest)) {
@@ -51,15 +51,15 @@ public class UserService {
         }
     }
 
-    private static boolean validPasswordLength(UserChangePasswordRequest userChangePasswordRequest) {
+    private boolean validPasswordLength(UserChangePasswordRequest userChangePasswordRequest) {
         return userChangePasswordRequest.getNewPassword().length() < PASSWORD_MIN_LENGTH;
     }
 
-    private static boolean containsUpperCase(UserChangePasswordRequest userChangePasswordRequest) {
+    private boolean containsUpperCase(UserChangePasswordRequest userChangePasswordRequest) {
         return userChangePasswordRequest.getNewPassword().matches(".*[A-Z].*");
     }
 
-    private static boolean containsNumber(UserChangePasswordRequest userChangePasswordRequest) {
+    private boolean containsNumber(UserChangePasswordRequest userChangePasswordRequest) {
         return userChangePasswordRequest.getNewPassword().matches(".*\\d.*");
     }
 }
