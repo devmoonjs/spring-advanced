@@ -23,10 +23,13 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,6 +70,7 @@ class TodoServiceTest {
 
     @Test
     void 일정_리스트_가져오기() {
+        // given
         int page = 1;
         int size = 10;
 
@@ -80,15 +84,36 @@ class TodoServiceTest {
 
         Pageable pageable = PageRequest.of(page - 1, size);
 
+        List<Todo> todoList = Arrays.asList(todo, todo2);
+        Page<Todo> todoPage = new PageImpl<>(todoList, pageable, todoList.size());
 
-
-        given(todoRepository.findAllByOrderByModifiedAtDesc(pageable)).willReturn(todoList);
+        given(todoRepository.findAllByOrderByModifiedAtDesc(any(Pageable.class))).willReturn(todoPage);
 
         // when
         Page<TodoResponse> responses = todoService.getTodos(page, size);
 
         // then
-        assertEquals(2, responses.getSize());
+        assertEquals(2, responses.getTotalElements());
 
+    }
+
+    @Test
+    void 일정_하나만_가져오기() {
+        // given
+        long todoId = 1L;
+
+        User user = new User("email@email.com", "1234", UserRole.USER);
+        ReflectionTestUtils.setField(user, "id", 1L);
+
+        Todo todo = new Todo("title", "test", "weather", user);
+        ReflectionTestUtils.setField(todo, "id", 1L);
+
+        given(todoRepository.findByIdWithUser(anyLong())).willReturn(Optional.of(todo));
+
+        // when
+        TodoResponse response = todoService.getTodo(todoId);
+
+        // then
+        assertNotNull(response);
     }
 }

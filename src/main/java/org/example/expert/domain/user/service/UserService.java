@@ -47,7 +47,7 @@ public class UserService {
         if (validPasswordLength(userChangePasswordRequest) ||
                 !containsNumber(userChangePasswordRequest) ||
                 !containsUpperCase(userChangePasswordRequest)) {
-            throw new InvalidRequestException("새 비밀번호" + PASSWORD_MIN_LENGTH + " 자 이상이어야 하고, 숫자와 대문자를 포함해야 합니다.");
+            throw new InvalidRequestException("새 비밀번호는 " + PASSWORD_MIN_LENGTH + " 자 이상이어야 하고, 숫자와 대문자를 포함해야 합니다.");
         }
     }
 
