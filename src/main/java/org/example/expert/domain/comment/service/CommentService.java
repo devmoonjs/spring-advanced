@@ -8,6 +8,7 @@ import org.example.expert.domain.comment.entity.Comment;
 import org.example.expert.domain.comment.repository.CommentRepository;
 import org.example.expert.domain.common.dto.AuthUser;
 import org.example.expert.domain.common.exception.InvalidRequestException;
+import org.example.expert.domain.manager.entity.Manager;
 import org.example.expert.domain.todo.entity.Todo;
 import org.example.expert.domain.todo.repository.TodoRepository;
 import org.example.expert.domain.user.dto.response.UserResponse;
@@ -32,6 +33,12 @@ public class CommentService {
         Todo todo = todoRepository.findById(todoId).orElseThrow(() ->
                 new InvalidRequestException("Todo not found"));
 
+        List<Manager> managers = todo.getManagers();
+
+        if (!isManagerMatched(managers, user)) {
+            throw new InvalidRequestException("안됨");
+        }
+
         Comment newComment = new Comment(
                 commentSaveRequest.getContents(),
                 user,
@@ -45,6 +52,11 @@ public class CommentService {
                 savedComment.getContents(),
                 new UserResponse(user.getId(), user.getEmail())
         );
+    }
+
+    public boolean isManagerMatched(List<Manager> managers, User user) {
+        return managers.stream()
+                .anyMatch(manager -> manager.getId().equals(user.getId()));
     }
 
     public List<CommentResponse> getComments(long todoId) {

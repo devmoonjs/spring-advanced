@@ -7,6 +7,7 @@ import org.example.expert.domain.comment.entity.Comment;
 import org.example.expert.domain.comment.repository.CommentRepository;
 import org.example.expert.domain.common.dto.AuthUser;
 import org.example.expert.domain.common.exception.InvalidRequestException;
+import org.example.expert.domain.manager.entity.Manager;
 import org.example.expert.domain.todo.entity.Todo;
 import org.example.expert.domain.todo.repository.TodoRepository;
 import org.example.expert.domain.user.entity.User;
@@ -18,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -65,6 +67,13 @@ class CommentServiceTest {
         User user = User.fromAuthUser(authUser);
         Todo todo = new Todo("title", "title", "contents", user);
         Comment comment = new Comment(request.getContents(), user, todo);
+
+        List<Manager> managers = new ArrayList<>();
+        Manager manager = new Manager(user, todo);
+        ReflectionTestUtils.setField(manager, "id", 1L);
+
+        managers.add(manager);
+        ReflectionTestUtils.setField(todo, "managers", managers);
 
         given(todoRepository.findById(anyLong())).willReturn(Optional.of(todo));
         given(commentRepository.save(any())).willReturn(comment);
