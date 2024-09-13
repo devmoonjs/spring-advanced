@@ -1,3 +1,3 @@
-# 테스트 코드
+# TEST COVERAGE
 
 <img src = "test_coverage.png">
